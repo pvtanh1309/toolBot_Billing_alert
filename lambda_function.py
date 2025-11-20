@@ -4,11 +4,11 @@ import boto3
 import requests
 from datetime import datetime, timedelta, timezone
 
-TELEGRAM_API_TOKEN = "8058574955:AAESzChg0Cv_GGmmErIYvvWugUQqWprgVl8"
-TELEGRAM_CHAT_ID = "6568421005"
+TELEGRAM_API_TOKEN = "....."    #Do botFather cấp
+TELEGRAM_CHAT_ID = "......."    #Kiểm tra qua CloudWatch
 AWS_REGION = "ap-southeast-1"  # Change to your AWS region
 BUDGET_NAME = "LearningBudget"  # Only if you have already created a budget
-YOUR_AWS_ACCOUNT_ID = "792023348046"
+YOUR_AWS_ACCOUNT_ID = "......"
 
 
 def send_telegram_message(message):
@@ -184,5 +184,6 @@ def lambda_handler(event, context):
 
     print(message)
     send_telegram_message(message)
+
 
     return {"statusCode": 200, "body": "Report sent!"}
