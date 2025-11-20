@@ -1,43 +1,42 @@
-# AWS Billing Notifier (Lambda + Telegram)
+# AWS Billing Notifier (Lambda + EventBridge + API Gateway + Budgets)
 
 ## 📌 Giới thiệu
-Đây là hàm **AWS Lambda** dùng để tự động gửi báo cáo chi phí AWS hàng ngày qua **Telegram BotFather**.  
-Hàm sẽ chạy theo lịch định sẵn (08:00 và 22:00 giờ Việt Nam) và gửi thông tin chi phí, budget, cùng top dịch vụ tiêu tốn nhiều nhất.
+Hệ thống này giúp tự động gửi báo cáo chi phí AWS qua Telegram.  
+Có thể chạy theo lịch (EventBridge) hoặc gọi thủ công qua API Gateway.
 
-## ⚙️ Cấu hình cần thiết
-1. **AWS Services**
-   - Lambda (Python 3.12)
-   - AWS Cost Explorer
-   - AWS Budgets
-   - IAM Role với quyền:
-     - `ce:GetCostAndUsage`
-     - `budgets:DescribeBudget`
-     - `kms:Decrypt` (nếu dùng KMS cho secrets)
+## ⚙️ Thành phần
+- **AWS Budgets**: Theo dõi chi phí và ngưỡng cảnh báo.
+- **AWS Lambda**: Hàm Python xử lý dữ liệu chi phí.
+- **Amazon EventBridge**: Trigger Lambda theo lịch (07:00 và 22:00 VN).
+- **Amazon API Gateway**: Endpoint HTTP để gọi Lambda thủ công.
+- **Telegram Bot**: Nhận báo cáo chi phí.
 
-2. **Biến môi trường Lambda**
-   - `TELEGRAM_API_TOKEN` : Token của Telegram Bot
-   - `TELEGRAM_CHAT_ID` : Chat ID để gửi báo cáo
-   - `AWS_REGION` : Vùng AWS (ví dụ `ap-southeast-1`)
-   - `YOUR_AWS_ACCOUNT_ID` : ID tài khoản AWS
-   - `BUDGET_NAME` : Tên budget cần theo dõi
-   - `TEST_MODE` : `True` để chạy giả lập, `False` để chạy thật
+## 🔧 Cấu hình
+1. Tạo Lambda function (Python 3.12).
+2. Copy code từ `lambda_function.py`.
+3. Cấu hình biến môi trường:
+   - `TELEGRAM_API_TOKEN`
+   - `TELEGRAM_CHAT_ID`
+   - `AWS_REGION`
+   - `YOUR_AWS_ACCOUNT_ID`
+4. Tạo EventBridge Rule để trigger Lambda theo lịch.
+5. (Tuỳ chọn) Tạo API Gateway để gọi Lambda qua HTTP.
 
-3. **Test Mode**
-   - Khi `TEST_MODE=True`, hàm sẽ dùng dữ liệu giả lập:
-     ```python
-     TEST_YESTERDAY_COST = 2.3
-     TEST_MONTH_COST = 45.7
-     TEST_YEAR_COST = 320.5
-     ```
+## Ví dụ báo cáo
+🔔 BÁO CÁO CHI PHÍ AWS
 
-## 📝 Cách triển khai
-1. Tạo Lambda function mới (Python 3.12).
-2. Copy toàn bộ code trong `lambda_function.py` vào Lambda.
-3. Cấu hình biến môi trường như trên.
-4. Tạo **CloudWatch Event Rule** để trigger Lambda lúc 08:00 và 22:00 (giờ VN).
-5. Kiểm tra log trong CloudWatch để đảm bảo báo cáo được gửi thành công.
+📅 Ngày 2025-11-19 💵 Chi phí: $2.3 📈 +53.3% vs hôm kia
 
-## 📊 Nội dung báo cáo
-Ví dụ báo cáo gửi qua Telegram:
+📆 Tháng này (từ 2025-11-01) 💰 Tổng chi: $45.7
 
+✅ Budget MyBudget: • Đã dùng: $45.7 / $100 • Tỷ lệ: 45.7%
 
+📊 Top dịch vụ:
+
+Amazon EC2: $3.5
+
+AWS Lambda: $1.2
+
+Amazon S3: $0.8
+
+━━━━━━━━━━━━━━━━━━ 📈 Năm 2025 (từ 2025-01-01) 💎 Tổng chi: $320.5
